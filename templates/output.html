@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>יומן פגישות, פלט</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f7fa; margin:0; padding:20px; direction:rtl; }
+    .container { max-width: 1000px; margin:0 auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
+    h1 { text-align:center; margin:0 0 15px; color:#2c3e50; }
+    .btn { display:inline-block; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; text-decoration:none; }
+    .btn:hover { background:#2980b9; }
+    .btn.small { padding:6px 10px; font-size:13px; }
+    .danger { background:#e74c3c; }
+    .danger:hover { background:#c0392b; }
+    .success { background:#27ae60; }
+    .success:hover { background:#1e8449; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { border:1px solid #ddd; padding:10px; text-align:center; }
+    th { background:#3498db; color:#fff; }
+    tr:nth-child(even) { background:#f9f9f9; }
+    .top { display:flex; justify-content:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+    .empty { text-align:center; color:#e74c3c; margin-top:20px; }
+    form { margin:0; }
+    .row-actions { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>רשימת פגישות</h1>
+
+    <div class="top">
+      <a class="btn" href="/input">הוסף פגישה</a>
+    </div>
+
+    {% if appointments|length == 0 %}
+      <div class="empty">אין פגישות שמורות</div>
+    {% else %}
+      <table>
+        <thead>
+          <tr>
+            <th>מזהה</th>
+            <th>נושא</th>
+            <th>תאריך</th>
+            <th>שעה</th>
+            <th>מיקום</th>
+            <th>הערות</th>
+            <th>סטטוס</th>
+            <th>עודכן לאחרונה</th>
+            <th>פעולות</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in appointments %}
+          <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.title }}</td>
+            <td>{{ a.date }}</td>
+            <td>{{ a.time }}</td>
+            <td>{{ a.location }}</td>
+            <td>{{ a.notes }}</td>
+            <td>
+              {% if a.status == "planned" %}
+                מתוכנן
+              {% elif a.status == "done" %}
+                הושלם
+              {% elif a.status == "canceled" %}
+                בוטל
+              {% else %}
+                {{ a.status }}
+              {% endif %}
+            </td>
+            <td>{{ a.updated_at if a.updated_at else "" }}</td>
+            <td>
+              <div class="row-actions">
+                {% if a.status != "done" %}
+                  <form method="post" action="/complete/{{ a.id }}">
+                    <button class="btn success small" type="submit">סמן כהושלמה</button>
+                  </form>
+                {% endif %}
+                <a class="btn small" href="/edit/{{ a.id }}">ערוך</a>
+                <form method="post" action="/delete/{{ a.id }}" onsubmit="return confirm('האם למחוק את הפגישה הזו?');">
+                  <button class="btn danger small" type="submit">מחק</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</body>
+</html>

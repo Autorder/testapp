@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>יומן פגישות, קלט</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f7fa; margin:0; padding:20px; direction:rtl; }
+    .container { max-width: 700px; margin:0 auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
+    h1 { text-align:center; margin:0 0 15px; color:#2c3e50; }
+    .row { margin-bottom:12px; }
+    label { display:block; margin-bottom:6px; font-weight:bold; color:#34495e; }
+    input, textarea, select { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; font-size:16px; }
+    textarea { height:110px; resize:vertical; }
+    .btn { display:inline-block; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; text-decoration:none; }
+    .btn:hover { background:#2980b9; }
+    .msg { background:#fff3cd; border:1px solid #ffeeba; padding:10px; border-radius:6px; margin-bottom:12px; }
+    .actions { display:flex; gap:10px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>יומן פגישות</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="msg">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="/input">
+      <div class="row">
+        <label>נושא פגישה</label>
+        <input name="title" type="text" placeholder="למשל פגישה עם ספק" required>
+      </div>
+
+      <div class="row">
+        <label>תאריך</label>
+        <input name="date" type="date" required>
+      </div>
+
+      <div class="row">
+        <label>שעה</label>
+        <input name="time" type="time" required>
+      </div>
+
+      <div class="row">
+        <label>מיקום</label>
+        <input name="location" type="text" placeholder="למשל תל אביב">
+      </div>
+
+      <div class="row">
+        <label>הערות</label>
+        <textarea name="notes" placeholder="מה חשוב לזכור"></textarea>
+      </div>
+
+      <div class="row">
+        <label>סטטוס</label>
+        <select name="status">
+          <option value="planned" selected>מתוכנן</option>
+          <option value="done">הושלם</option>
+          <option value="canceled">בוטל</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit">שמור פגישה</button>
+        <a class="btn" href="/output">לרשימת פגישות</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
