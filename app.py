@@ -1,9 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from db import init_db, get_cursor
+import os
+
 
 app = Flask(__name__)
 app.secret_key = "dev-secret"
 ALLOWED_STATUSES = {"planned", "done", "canceled"}
+
+
+def format_timestamp(value):
+    if not value:
+        return ""
+    return value.strftime("%Y-%m-%d %H:%M:%S")
 
 
 @app.get("/")
@@ -68,6 +76,7 @@ def list_appointments():
                 "notes": r[5] or "",
                 "status": r[6],
                 "updated_at": r[7],
+                "updated_at_text": format_timestamp(r[7]),
                 "created_at": r[8],
             }
         )
@@ -152,4 +161,5 @@ def update_appointment(appt_id: int):
 
 if __name__ == "__main__":
     init_db()
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    port = int(os.getenv("PORT", "5056"))
+    app.run(host="127.0.0.1", port=port, debug=True)

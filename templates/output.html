@@ -70,7 +70,7 @@
                 {{ a.status }}
               {% endif %}
             </td>
-            <td>{{ a.updated_at if a.updated_at else "" }}</td>
+            <td>{{ a.updated_at_text }}</td>
             <td>
               <div class="row-actions">
                 {% if a.status != "done" %}
