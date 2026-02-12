@@ -1,126 +1,130 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>יומן פגישות, פלט</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f4f7fa; margin:0; padding:20px; direction:rtl; }
-    .container { max-width: 1200px; margin:0 auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
-    h1 { text-align:center; margin:0 0 15px; color:#2c3e50; }
-    .btn { display:inline-block; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; text-decoration:none; }
-    .btn:hover { background:#2980b9; }
-    .btn.small { padding:6px 10px; font-size:13px; }
-    .danger { background:#e74c3c; }
-    .danger:hover { background:#c0392b; }
-    .success { background:#27ae60; }
-    .success:hover { background:#1e8449; }
-    .admin { background:#8e44ad; }
-    .admin:hover { background:#7d3c98; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { border:1px solid #ddd; padding:10px; text-align:center; }
-    th { background:#3498db; color:#fff; }
-    tr:nth-child(even) { background:#f9f9f9; }
-    .top { display:flex; justify-content:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
-    .empty { text-align:center; color:#e74c3c; margin-top:20px; }
-    .msg { background:#fff3cd; border:1px solid #ffeeba; padding:10px; border-radius:6px; margin-bottom:12px; }
-    form { margin:0; }
-    .row-actions { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>{{ title_text if title_text else "רשימת פגישות" }}</h1>
+{% extends "base.html" %}
 
-    <div class="top">
-      <a class="btn" href="/input">הוסף פגישה</a>
-      <a class="btn" href="/output">הרשימה שלי</a>
-      {% if current_user and current_user.is_admin %}
-        <a class="btn admin" href="/admin/users">משתמשים</a>
-      {% endif %}
-      <form method="post" action="/logout">
-        <button class="btn" type="submit">התנתק</button>
-      </form>
+{% block title %}יומן פגישות, פלט{% endblock %}
+
+{% block content %}
+  <div class="card">
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+      <div>
+        <h1 style="margin:0;">{{ title_text if title_text else "רשימת פגישות" }}</h1>
+        <div class="helper" style="margin-top:6px;">
+          צפייה וניהול פגישות
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <a class="btn btn-primary" href="/input">הוסף פגישה</a>
+        <a class="btn btn-secondary" href="/output">הרשימה שלי</a>
+        <a class="btn btn-secondary" href="/">בחירת דיזיין</a>
+
+        <span class="status">
+          דיזיין נוכחי
+          {% if theme_name == "enterprise" %}
+            1
+          {% elif theme_name == "soft" %}
+            2
+          {% elif theme_name == "pro" %}
+            3
+          {% elif theme_name == "mobile" %}
+            4
+          {% else %}
+            1
+          {% endif %}
+        </span>
+      </div>
     </div>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="msg">{{ messages[0] }}</div>
+        <div class="helper" style="margin-bottom:12px;color:var(--warning);">
+          {{ messages[0] }}
+        </div>
       {% endif %}
     {% endwith %}
 
     {% if appointments|length == 0 %}
-      <div class="empty">אין פגישות שמורות</div>
+      <div class="helper" style="text-align:center;color:var(--error);padding:18px 0;">
+        אין פגישות שמורות
+      </div>
     {% else %}
-      <table>
-        <thead>
-          <tr>
-            <th>מזהה</th>
-            <th>נושא</th>
-            <th>תאריך</th>
-            <th>שעה</th>
-            <th>מיקום</th>
-            <th>הערות</th>
-            <th>סטטוס</th>
-            <th>עודכן לאחרונה</th>
-            <th>עדכון סטטוס אחרון</th>
-            <th>מי עדכן סטטוס</th>
-            {% if show_owner_column %}
-              <th>בעלים</th>
-            {% endif %}
-            <th>פעולות</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for a in appointments %}
-          <tr>
-            <td>{{ a.id }}</td>
-            <td>{{ a.title }}</td>
-            <td>{{ a.date }}</td>
-            <td>{{ a.time }}</td>
-            <td>{{ a.location }}</td>
-            <td>{{ a.notes }}</td>
-            <td>
-              {% if a.status == "planned" %}
-                מתוכנן
-              {% elif a.status == "done" %}
-                הושלם
-              {% elif a.status == "canceled" %}
-                בוטל
-              {% else %}
-                {{ a.status }}
+      <div style="overflow:auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>מזהה</th>
+              <th>נושא</th>
+              <th>תאריך</th>
+              <th>שעה</th>
+              <th>מיקום</th>
+              <th>הערות</th>
+              <th>סטטוס</th>
+              <th>עודכן לאחרונה</th>
+              <th>עדכון סטטוס אחרון</th>
+              <th>מי עדכן סטטוס</th>
+              {% if show_owner_column %}
+                <th>בעלים</th>
               {% endif %}
-            </td>
-            <td>{{ a.updated_at_text }}</td>
-            <td>{{ a.status_updated_at_text }}</td>
-            <td>{{ a.status_updated_by_email }}</td>
-            {% if show_owner_column %}
-              <td>{{ a.owner_email }}</td>
-            {% endif %}
-            <td>
-              <div class="row-actions">
-                {% if can_change_status %}
-                  <a class="btn admin small" href="/status/{{ a.id }}?next={{ current_path }}">שנה סטטוס</a>
-                {% endif %}
-
-                {% if can_manage_fields %}
-                  {% if a.status != "done" %}
-                    <form method="post" action="/complete/{{ a.id }}">
-                      <button class="btn success small" type="submit">סמן כהושלמה</button>
-                    </form>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+              <tr>
+                <td>{{ a.id }}</td>
+                <td>{{ a.title }}</td>
+                <td>{{ a.date }}</td>
+                <td>{{ a.time }}</td>
+                <td>{{ a.location }}</td>
+                <td style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  {{ a.notes }}
+                </td>
+                <td>
+                  {% if a.status == "planned" %}
+                    <span class="status status-warning">מתוכנן</span>
+                  {% elif a.status == "done" %}
+                    <span class="status status-success">הושלם</span>
+                  {% elif a.status == "canceled" %}
+                    <span class="status status-error">בוטל</span>
+                  {% else %}
+                    <span class="status">{{ a.status }}</span>
                   {% endif %}
-                  <a class="btn small" href="/edit/{{ a.id }}">ערוך</a>
-                  <form method="post" action="/delete/{{ a.id }}" onsubmit="return confirm('האם למחוק את הפגישה הזו?');">
-                    <button class="btn danger small" type="submit">מחק</button>
-                  </form>
+                </td>
+                <td>{{ a.updated_at_text }}</td>
+                <td>{{ a.status_updated_at_text }}</td>
+                <td>{{ a.status_updated_by_email }}</td>
+                {% if show_owner_column %}
+                  <td>{{ a.owner_email }}</td>
                 {% endif %}
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+                <td>
+                  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+
+                    {% if can_change_status %}
+                      <a class="btn btn-secondary" href="/status/{{ a.id }}?next={{ current_path }}">שנה סטטוס</a>
+                    {% endif %}
+
+                    {% if can_manage_fields %}
+                      {% if a.status != "done" %}
+                        <form method="post" action="/complete/{{ a.id }}" style="margin:0;">
+                          <button class="btn btn-secondary" type="submit">סמן כהושלמה</button>
+                        </form>
+                      {% endif %}
+
+                      <a class="btn btn-secondary" href="/edit/{{ a.id }}">ערוך</a>
+
+                      <form method="post" action="/delete/{{ a.id }}" style="margin:0;" onsubmit="return confirm('האם למחוק את הפגישה הזו?');">
+                        <button class="btn btn-secondary" type="submit" style="background:var(--error);color:white;">מחק</button>
+                      </form>
+                    {% endif %}
+
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% endif %}
+
   </div>
-</body>
-</html>
+{% endblock %}

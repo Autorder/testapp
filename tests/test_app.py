@@ -193,3 +193,36 @@ def test_edit_cannot_change_date_or_status_and_updates_updated_at(client, db_mod
         cur.execute("SELECT COUNT(*) FROM testapp_appointments WHERE id = %s", (appt_id,))
         count = cur.fetchone()[0]
     assert count == 0
+
+
+def test_theme_route_sets_expected_session_value_and_redirects(client):
+    expected = {
+        "enterprise": "css/enterprise.css",
+        "soft": "css/soft.css",
+        "pro": "css/pro.css",
+        "mobile": "css/mobile.css",
+    }
+
+    for theme_name, css_path in expected.items():
+        res = client.post(f"/theme/set/{theme_name}", follow_redirects=False)
+        assert res.status_code == 302
+        assert res.headers["Location"].endswith("/login")
+
+        with client.session_transaction() as sess:
+            assert sess.get("theme") == theme_name
+
+        login_res = client.get("/login")
+        login_html = login_res.get_data(as_text=True)
+        assert css_path in login_html
+
+
+def test_theme_route_invalid_theme_falls_back_to_enterprise(client):
+    res = client.post("/theme/set/not-a-theme", follow_redirects=False)
+    assert res.status_code == 302
+    assert res.headers["Location"].endswith("/login")
+
+    with client.session_transaction() as sess:
+        assert sess.get("theme") == "enterprise"
+
+    login_res = client.get("/login")
+    assert "css/enterprise.css" in login_res.get_data(as_text=True)

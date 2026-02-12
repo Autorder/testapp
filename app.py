@@ -8,7 +8,9 @@ from db import get_cursor, init_db
 
 app = Flask(__name__)
 app.secret_key = "dev-secret"
+
 ALLOWED_STATUSES = {"planned", "done", "canceled"}
+ALLOWED_THEMES = {"enterprise", "soft", "pro", "mobile"}
 
 
 def format_timestamp(value):
@@ -144,16 +146,45 @@ def load_user(user_id):
     return {"id": row[0], "email": row[1], "is_admin": row[2]}
 
 
+def get_theme_name():
+    name = (session.get("theme") or "enterprise").strip().lower()
+    if name not in ALLOWED_THEMES:
+        return "enterprise"
+    return name
+
+
+def get_theme_css(name):
+    css_map = {
+        "enterprise": "css/enterprise.css",
+        "soft": "css/soft.css",
+        "pro": "css/pro.css",
+        "mobile": "css/mobile.css",
+    }
+    return css_map.get(name, "css/enterprise.css")
+
+
 @app.context_processor
-def inject_current_user():
-    return {"current_user": get_current_user()}
+def inject_globals():
+    name = get_theme_name()
+    return {
+        "current_user": get_current_user(),
+        "theme_name": name,
+        "theme_css": get_theme_css(name),
+    }
 
 
 @app.get("/")
-def home():
-    if not get_current_user():
-        return redirect(url_for("login"))
-    return redirect(url_for("new_appointment"))
+def theme_select():
+    return render_template("theme_select.html")
+
+
+@app.post("/theme/set/<name>")
+def theme_set(name: str):
+    name = (name or "").strip().lower()
+    if name not in ALLOWED_THEMES:
+        name = "enterprise"
+    session["theme"] = name
+    return redirect(url_for("login"))
 
 
 @app.get("/register")
@@ -200,7 +231,7 @@ def login():
 @app.post("/login")
 def login_post():
     email = (request.form.get("email") or "").strip().lower()
-    password = request.form.get("password") or ""
+    password = (request.form.get("password") or "").strip()
 
     with get_cursor() as cur:
         cur.execute(

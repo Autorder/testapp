@@ -1,0 +1,142 @@
+:root{
+  --primary:#1F4E8C;
+  --secondary:#2A9D8F;
+  --accent:#E9C46A;
+  --bg:#F7F9FC;
+  --surface:#FFFFFF;
+  --text:#1B263B;
+  --muted:#6B7280;
+  --success:#2E7D32;
+  --warning:#ED6C02;
+  --error:#D32F2F;
+  --radius:8px;
+  --border:#E5E7EB;
+  --shadow:0 8px 20px rgba(0,0,0,0.08);
+  --font-head:"Heebo", system-ui, -apple-system, "Segoe UI", Arial;
+  --font-body:"Assistant", system-ui, -apple-system, "Segoe UI", Arial;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+}
+
+h1,h2,h3{
+  font-family:var(--font-head);
+  margin:0 0 12px 0;
+}
+
+h1{
+  font-size:32px;
+  margin-bottom:24px;
+}
+
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px;
+  padding-top:40px;
+  padding-bottom:40px;
+}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:32px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius:var(--radius);
+  border:1px solid transparent;
+  font-weight:600;
+  cursor:pointer;
+  text-decoration:none;
+  min-width:120px;
+}
+
+.btn-primary{
+  background:var(--primary);
+  color:white;
+}
+
+.btn-secondary{
+  background:var(--secondary);
+  color:white;
+}
+
+.input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  background:white;
+  font-size:16px;
+  height:46px;
+  box-sizing:border-box;
+}
+
+textarea.input{
+  height:auto;
+  min-height:130px;
+  resize:vertical;
+}
+
+.label{
+  font-weight:600;
+  color:var(--text);
+  margin-bottom:6px;
+  display:block;
+}
+
+.helper{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:6px;
+}
+
+.status{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:600;
+  border:1px solid var(--border);
+}
+
+.status-success{ background:#E8F5E9; color:var(--success); }
+.status-warning{ background:#FFF3E0; color:var(--warning); }
+.status-error{ background:#FFEBEE; color:var(--error); }
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+
+.table th,.table td{
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  text-align:right;
+  vertical-align:middle;
+}
+
+.table tr:nth-child(even){
+  background:#FBFCFE;
+}
+select.input{
+  height:46px;
+}

@@ -1,55 +1,63 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>הרשמה</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f4f7fa; margin:0; padding:20px; direction:rtl; }
-    .container { max-width: 500px; margin:0 auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
-    h1 { text-align:center; margin:0 0 15px; color:#2c3e50; }
-    .row { margin-bottom:12px; }
-    label { display:block; margin-bottom:6px; font-weight:bold; color:#34495e; }
-    input { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; font-size:16px; }
-    .checkbox-row { display:flex; align-items:center; gap:8px; justify-content:flex-start; }
-    .checkbox-row input { width:auto; }
-    .btn { display:inline-block; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; text-decoration:none; }
-    .btn:hover { background:#2980b9; }
-    .msg { background:#fff3cd; border:1px solid #ffeeba; padding:10px; border-radius:6px; margin-bottom:12px; }
-    .actions { display:flex; gap:10px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>הרשמה</h1>
+{% extends "base.html" %}
+
+{% block title %}הרשמה{% endblock %}
+
+{% block content %}
+  <div class="card" style="max-width:500px;margin:0 auto;">
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+      <h1 style="margin:0;">הרשמה</h1>
+
+      <div style="display:flex;gap:10px;align-items:center;">
+        <a class="btn btn-secondary" href="/">בחירת דיזיין</a>
+        <span class="status">
+          דיזיין נוכחי
+          {% if theme_name == "enterprise" %}
+            1
+          {% elif theme_name == "soft" %}
+            2
+          {% elif theme_name == "pro" %}
+            3
+          {% elif theme_name == "mobile" %}
+            4
+          {% else %}
+            1
+          {% endif %}
+        </span>
+      </div>
+    </div>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="msg">{{ messages[0] }}</div>
+        <div class="helper" style="margin-bottom:12px;color:var(--warning);text-align:center;">
+          {{ messages[0] }}
+        </div>
       {% endif %}
     {% endwith %}
 
     <form method="post" action="/register">
-      <div class="row">
-        <label>אימייל</label>
-        <input name="email" type="email" required>
+
+      <div style="margin-bottom:14px;">
+        <label class="label">אימייל</label>
+        <input class="input" name="email" type="email" required>
       </div>
 
-      <div class="row">
-        <label>סיסמה</label>
-        <input name="password" type="password" required>
+      <div style="margin-bottom:14px;">
+        <label class="label">סיסמה</label>
+        <input class="input" name="password" type="password" required>
       </div>
 
-      <div class="row checkbox-row">
-        <input id="is_admin" name="is_admin" type="checkbox">
-        <label for="is_admin">צור משתמש אדמין</label>
+      <div style="margin-bottom:18px;display:flex;align-items:center;gap:8px;justify-content:flex-start;">
+        <input id="is_admin" name="is_admin" type="checkbox" style="width:auto;">
+        <label for="is_admin" style="margin:0;">צור משתמש אדמין</label>
       </div>
 
-      <div class="actions">
-        <button class="btn" type="submit">הירשם</button>
-        <a class="btn" href="/login">להתחברות</a>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" type="submit">הירשם</button>
+        <a class="btn btn-secondary" href="/login">להתחברות</a>
       </div>
+
     </form>
+
   </div>
-</body>
-</html>
+{% endblock %}
