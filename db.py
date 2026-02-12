@@ -32,6 +32,18 @@ def init_db():
     with get_cursor() as cur:
         cur.execute(
             """
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """
+        )
+
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS testapp_appointments (
                 id SERIAL PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -45,6 +57,7 @@ def init_db():
             );
             """
         )
+
         cur.execute(
             """
             ALTER TABLE testapp_appointments
@@ -67,9 +80,28 @@ def init_db():
             END $$;
             """
         )
+
         cur.execute(
             """
             ALTER TABLE testapp_appointments
             ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+            """
+        )
+        cur.execute(
+            """
+            ALTER TABLE testapp_appointments
+            ADD COLUMN IF NOT EXISTS owner_user_id INTEGER;
+            """
+        )
+        cur.execute(
+            """
+            ALTER TABLE testapp_appointments
+            ADD COLUMN IF NOT EXISTS status_updated_at TIMESTAMP;
+            """
+        )
+        cur.execute(
+            """
+            ALTER TABLE testapp_appointments
+            ADD COLUMN IF NOT EXISTS status_updated_by_user_id INTEGER;
             """
         )

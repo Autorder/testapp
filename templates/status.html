@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>יומן פגישות, קלט</title>
+  <title>שינוי סטטוס</title>
   <style>
     body { font-family: Arial, sans-serif; background:#f4f7fa; margin:0; padding:20px; direction:rtl; }
     .container { max-width: 700px; margin:0 auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
@@ -12,26 +12,16 @@
     label { display:block; margin-bottom:6px; font-weight:bold; color:#34495e; }
     input, textarea, select { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; font-size:16px; }
     textarea { height:110px; resize:vertical; }
+    .readonly { background:#f2f4f8; color:#54606f; }
     .btn { display:inline-block; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; text-decoration:none; }
     .btn:hover { background:#2980b9; }
-    .msg { background:#fff3cd; border:1px solid #ffeeba; padding:10px; border-radius:6px; margin-bottom:12px; }
     .actions { display:flex; gap:10px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
-    .top { display:flex; gap:10px; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
+    .msg { background:#fff3cd; border:1px solid #ffeeba; padding:10px; border-radius:6px; margin-bottom:12px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>יומן פגישות</h1>
-
-    <div class="top">
-      <a class="btn" href="/output">לרשימת פגישות</a>
-      {% if current_user and current_user.is_admin %}
-        <a class="btn" href="/admin/users">משתמשים</a>
-      {% endif %}
-      <form method="post" action="/logout">
-        <button class="btn" type="submit">התנתק</button>
-      </form>
-    </div>
+    <h1>שינוי סטטוס (אדמין)</h1>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -39,36 +29,51 @@
       {% endif %}
     {% endwith %}
 
-    <form method="post" action="/input">
-      <input type="hidden" name="status" value="planned">
+    <form method="post" action="/status/{{ appointment.id }}">
+      <input type="hidden" name="next" value="{{ back_url }}">
 
       <div class="row">
-        <label>נושא פגישה</label>
-        <input name="title" type="text" placeholder="למשל פגישה עם ספק" required>
+        <label>נושא</label>
+        <input class="readonly" type="text" value="{{ appointment.title }}" readonly>
       </div>
 
       <div class="row">
         <label>תאריך</label>
-        <input name="date" type="date" required>
+        <input class="readonly" type="text" value="{{ appointment.date }}" readonly>
       </div>
 
       <div class="row">
         <label>שעה</label>
-        <input name="time" type="time" required>
+        <input class="readonly" type="text" value="{{ appointment.time }}" readonly>
       </div>
 
       <div class="row">
         <label>מיקום</label>
-        <input name="location" type="text" placeholder="למשל תל אביב">
+        <input class="readonly" type="text" value="{{ appointment.location }}" readonly>
       </div>
 
       <div class="row">
         <label>הערות</label>
-        <textarea name="notes" placeholder="מה חשוב לזכור"></textarea>
+        <textarea class="readonly" readonly>{{ appointment.notes }}</textarea>
+      </div>
+
+      <div class="row">
+        <label>בעלים</label>
+        <input class="readonly" type="text" value="{{ appointment.owner_email }}" readonly>
+      </div>
+
+      <div class="row">
+        <label>סטטוס</label>
+        <select name="status" required>
+          <option value="planned" {% if appointment.status == 'planned' %}selected{% endif %}>מתוכנן</option>
+          <option value="done" {% if appointment.status == 'done' %}selected{% endif %}>הושלם</option>
+          <option value="canceled" {% if appointment.status == 'canceled' %}selected{% endif %}>בוטל</option>
+        </select>
       </div>
 
       <div class="actions">
-        <button class="btn" type="submit">שמור פגישה</button>
+        <button class="btn" type="submit">שמור סטטוס</button>
+        <a class="btn" href="{{ back_url }}">חזרה</a>
       </div>
     </form>
   </div>

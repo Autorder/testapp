@@ -6,7 +6,7 @@
   <title>יומן פגישות, פלט</title>
   <style>
     body { font-family: Arial, sans-serif; background:#f4f7fa; margin:0; padding:20px; direction:rtl; }
-    .container { max-width: 1000px; margin:0 auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
+    .container { max-width: 1200px; margin:0 auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
     h1 { text-align:center; margin:0 0 15px; color:#2c3e50; }
     .btn { display:inline-block; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; text-decoration:none; }
     .btn:hover { background:#2980b9; }
@@ -15,23 +15,39 @@
     .danger:hover { background:#c0392b; }
     .success { background:#27ae60; }
     .success:hover { background:#1e8449; }
+    .admin { background:#8e44ad; }
+    .admin:hover { background:#7d3c98; }
     table { width:100%; border-collapse:collapse; }
     th, td { border:1px solid #ddd; padding:10px; text-align:center; }
     th { background:#3498db; color:#fff; }
     tr:nth-child(even) { background:#f9f9f9; }
     .top { display:flex; justify-content:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
     .empty { text-align:center; color:#e74c3c; margin-top:20px; }
+    .msg { background:#fff3cd; border:1px solid #ffeeba; padding:10px; border-radius:6px; margin-bottom:12px; }
     form { margin:0; }
     .row-actions { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>רשימת פגישות</h1>
+    <h1>{{ title_text if title_text else "רשימת פגישות" }}</h1>
 
     <div class="top">
       <a class="btn" href="/input">הוסף פגישה</a>
+      <a class="btn" href="/output">הרשימה שלי</a>
+      {% if current_user and current_user.is_admin %}
+        <a class="btn admin" href="/admin/users">משתמשים</a>
+      {% endif %}
+      <form method="post" action="/logout">
+        <button class="btn" type="submit">התנתק</button>
+      </form>
     </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="msg">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
 
     {% if appointments|length == 0 %}
       <div class="empty">אין פגישות שמורות</div>
@@ -47,6 +63,11 @@
             <th>הערות</th>
             <th>סטטוס</th>
             <th>עודכן לאחרונה</th>
+            <th>עדכון סטטוס אחרון</th>
+            <th>מי עדכן סטטוס</th>
+            {% if show_owner_column %}
+              <th>בעלים</th>
+            {% endif %}
             <th>פעולות</th>
           </tr>
         </thead>
@@ -71,17 +92,28 @@
               {% endif %}
             </td>
             <td>{{ a.updated_at_text }}</td>
+            <td>{{ a.status_updated_at_text }}</td>
+            <td>{{ a.status_updated_by_email }}</td>
+            {% if show_owner_column %}
+              <td>{{ a.owner_email }}</td>
+            {% endif %}
             <td>
               <div class="row-actions">
-                {% if a.status != "done" %}
-                  <form method="post" action="/complete/{{ a.id }}">
-                    <button class="btn success small" type="submit">סמן כהושלמה</button>
+                {% if can_change_status %}
+                  <a class="btn admin small" href="/status/{{ a.id }}?next={{ current_path }}">שנה סטטוס</a>
+                {% endif %}
+
+                {% if can_manage_fields %}
+                  {% if a.status != "done" %}
+                    <form method="post" action="/complete/{{ a.id }}">
+                      <button class="btn success small" type="submit">סמן כהושלמה</button>
+                    </form>
+                  {% endif %}
+                  <a class="btn small" href="/edit/{{ a.id }}">ערוך</a>
+                  <form method="post" action="/delete/{{ a.id }}" onsubmit="return confirm('האם למחוק את הפגישה הזו?');">
+                    <button class="btn danger small" type="submit">מחק</button>
                   </form>
                 {% endif %}
-                <a class="btn small" href="/edit/{{ a.id }}">ערוך</a>
-                <form method="post" action="/delete/{{ a.id }}" onsubmit="return confirm('האם למחוק את הפגישה הזו?');">
-                  <button class="btn danger small" type="submit">מחק</button>
-                </form>
               </div>
             </td>
           </tr>

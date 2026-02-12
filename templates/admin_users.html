@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>משתמשים</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f7fa; margin:0; padding:20px; direction:rtl; }
+    .container { max-width: 1000px; margin:0 auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
+    h1 { text-align:center; margin:0 0 15px; color:#2c3e50; }
+    .btn { display:inline-block; padding:8px 12px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:14px; text-decoration:none; }
+    .btn:hover { background:#2980b9; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { border:1px solid #ddd; padding:10px; text-align:center; }
+    th { background:#3498db; color:#fff; }
+    tr:nth-child(even) { background:#f9f9f9; }
+    .top { display:flex; justify-content:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+    form { margin:0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ניהול משתמשים</h1>
+
+    <div class="top">
+      <a class="btn" href="/output">חזרה לרשימה שלי</a>
+      <form method="post" action="/logout">
+        <button class="btn" type="submit">התנתק</button>
+      </form>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>מזהה</th>
+          <th>אימייל</th>
+          <th>אדמין</th>
+          <th>נוצר</th>
+          <th>פעולה</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.email }}</td>
+          <td>{% if u.is_admin %}כן{% else %}לא{% endif %}</td>
+          <td>{{ u.created_at_text }}</td>
+          <td>
+            <a class="btn" href="/admin/users/{{ u.id }}/appointments">פתח רשימה</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
