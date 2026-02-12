@@ -63,6 +63,16 @@
       </div>
 
       <div class="row">
+        <label>עדכון סטטוס אחרון</label>
+        <input class="readonly" type="text" value="{{ appointment.status_updated_at_text }}" readonly>
+      </div>
+
+      <div class="row">
+        <label>מי עדכן סטטוס לאחרונה</label>
+        <input class="readonly" type="text" value="{{ appointment.status_updated_by_email }}" readonly>
+      </div>
+
+      <div class="row">
         <label>סטטוס</label>
         <select name="status" required>
           <option value="planned" {% if appointment.status == 'planned' %}selected{% endif %}>מתוכנן</option>

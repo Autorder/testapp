@@ -396,9 +396,12 @@ def status_page(appt_id: int):
                 a.location,
                 a.notes,
                 a.status,
-                owner_u.email
+                owner_u.email,
+                a.status_updated_at,
+                status_u.email
             FROM testapp_appointments a
             LEFT JOIN users owner_u ON owner_u.id = a.owner_user_id
+            LEFT JOIN users status_u ON status_u.id = a.status_updated_by_user_id
             WHERE a.id = %s
             """,
             (appt_id,),
@@ -418,6 +421,8 @@ def status_page(appt_id: int):
         "notes": row[5] or "",
         "status": row[6],
         "owner_email": row[7] or "",
+        "status_updated_at_text": format_timestamp(row[8]),
+        "status_updated_by_email": row[9] or "",
     }
     back_url = sanitize_next_url(request.args.get("next"))
     return render_template("status.html", appointment=appointment, back_url=back_url)
