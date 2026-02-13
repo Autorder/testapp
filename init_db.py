@@ -11,15 +11,28 @@ CREATE TABLE IF NOT EXISTS users (
 
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE TABLE IF NOT EXISTS testapp_appointments (
+  id SERIAL PRIMARY KEY,
+  owner_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  customer_name TEXT,
+  customer_phone TEXT,
+  start_time TIMESTAMPTZ,
+  end_time TIMESTAMPTZ,
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 """
 
 def main():
     database_url = os.environ.get("DATABASE_URL")
     if not database_url:
         raise RuntimeError("DATABASE_URL לא מוגדר")
+
     with psycopg2.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute(DDL)
+
     print("DB init done")
 
 if __name__ == "__main__":
